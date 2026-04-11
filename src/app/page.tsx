@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PromptEditor from "@/components/studio/PromptEditor";
 import GenerationSettings, {
   DEFAULT_SETTINGS,
@@ -19,6 +19,17 @@ export default function StudioPage() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [img2imgBase64, setImg2imgBase64] = useState<string | null>(null);
   const { state, generate } = useGeneration();
+
+  // Prompt aus Galerie übernehmen (via localStorage)
+  useEffect(() => {
+    const saved = localStorage.getItem("flux-studio-prompt");
+    if (saved) {
+      setPrompt(saved);
+      localStorage.removeItem("flux-studio-prompt");
+      // Kurz nach oben scrollen damit der Prompt sichtbar ist
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, []);
 
   const isGenerating = state.status === "queued" || state.status === "running";
 
