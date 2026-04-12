@@ -46,3 +46,8 @@ data/gallery.json
 
 # Claude
 .claude/
+
+# PyInstaller build artifacts
+launcher/build/
+launcher/dist/
+launcher/*.spec
