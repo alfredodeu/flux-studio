@@ -72,7 +72,7 @@ export function buildFlux2Workflow(p: Flux2WorkflowParams): Record<string, unkno
     "5":  { class_type: "EmptyFlux2LatentImage",  inputs: { width: p.width, height: p.height, batch_size: 1 } },
     "6":  { class_type: "RandomNoise",            inputs: { noise_seed: p.seed } },
     "7":  { class_type: "KSamplerSelect",         inputs: { sampler_name: p.sampler } },
-    "8":  { class_type: "Flux2Scheduler",         inputs: { scheduler: p.scheduler, steps: p.steps, model: ["1", 0] } },
+    "8":  { class_type: "Flux2Scheduler",         inputs: { scheduler: p.scheduler, steps: p.steps, model: ["1", 0], width: p.width, height: p.height } },
     "9":  { class_type: "CFGGuider",              inputs: { model: ["1", 0], positive: ["4", 0], negative: ["4", 0], cfg: 1.0 } },
     "10": { class_type: "SamplerCustomAdvanced",  inputs: { noise: ["6", 0], guider: ["9", 0], sampler: ["7", 0], sigmas: ["8", 0], latent_image: ["5", 0] } },
     "11": { class_type: "VAEDecode",              inputs: { samples: ["10", 0], vae: ["3", 0] } },
