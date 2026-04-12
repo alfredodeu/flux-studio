@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
     const flux  = !flux2 && isFluxModel(model);
 
     const FLUX2_CLIP = process.env.FLUX2_CLIP ?? "qwen_3_8b_fp8mixed.safetensors";
+    const FLUX2_VAE  = process.env.FLUX2_VAE  ?? "flux2-vae.safetensors";
     const FLUX_VAE   = "ae.safetensors";
 
     let workflow: Record<string, unknown>;
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
             positivePrompt: prompt,
             unetName: model,
             clipName: FLUX2_CLIP,
-            vaeName: FLUX_VAE,
+            vaeName: FLUX2_VAE,
             width, height, steps, cfg, sampler, scheduler, seed,
           })
         : flux
@@ -85,7 +86,7 @@ export async function POST(req: NextRequest) {
             positivePrompt: prompt,
             unetName: model,
             clipName: FLUX2_CLIP,
-            vaeName: FLUX_VAE,
+            vaeName: FLUX2_VAE,
             width, height, steps, cfg, sampler, scheduler, seed,
           })
         : flux
