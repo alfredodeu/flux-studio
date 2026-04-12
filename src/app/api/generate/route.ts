@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { buildWorkflow, buildImg2ImgWorkflow } from "@/lib/comfyui/workflow";
-import { buildFluxWorkflow, buildFluxImg2ImgWorkflow } from "@/lib/comfyui/workflow-flux";
+import { buildFluxWorkflow, buildFluxImg2ImgWorkflow, buildFlux2Workflow } from "@/lib/comfyui/workflow-flux";
 import { queuePrompt, uploadImageToComfyUI } from "@/lib/comfyui/client";
+
+function isFlux2Model(model: string) {
+  const m = model.toLowerCase();
+  return m.includes("flux-2") || m.includes("flux2");
+}
 
 function isFluxModel(model: string) {
   return model.toLowerCase().includes("flux");
@@ -32,24 +37,36 @@ export async function POST(req: NextRequest) {
     }
 
     const clientId = uuidv4();
-    const flux = isFluxModel(model);
+    const flux2 = isFlux2Model(model);
+    const flux  = !flux2 && isFluxModel(model);
+
+    const FLUX2_CLIP = process.env.FLUX2_CLIP ?? "qwen_3_8b_fp8mixed.safetensors";
+    const FLUX_VAE   = "ae.safetensors";
 
     let workflow: Record<string, unknown>;
 
     if (img2imgBase64) {
-      // Bild zuerst zu ComfyUI hochladen
       const uploadedFilename = await uploadImageToComfyUI(
         img2imgBase64,
         `input_${Date.now()}.png`
       );
-      workflow = flux
+      // FLUX.2 hat noch keinen img2img-Workflow → Fallback auf Text-to-Image
+      workflow = flux2
+        ? buildFlux2Workflow({
+            positivePrompt: prompt,
+            unetName: model,
+            clipName: FLUX2_CLIP,
+            vaeName: FLUX_VAE,
+            width, height, steps, cfg, sampler, scheduler, seed,
+          })
+        : flux
         ? buildFluxImg2ImgWorkflow({
             positivePrompt: prompt,
             negativePrompt,
             unetName: model,
             clip1: "t5xxl_fp16.safetensors",
             clip2: "clip_l.safetensors",
-            vaeName: "ae.safetensors",
+            vaeName: FLUX_VAE,
             width, height, steps, cfg, sampler, scheduler, seed,
             inputImageFilename: uploadedFilename,
             denoise,
@@ -63,14 +80,22 @@ export async function POST(req: NextRequest) {
             denoise,
           });
     } else {
-      workflow = flux
+      workflow = flux2
+        ? buildFlux2Workflow({
+            positivePrompt: prompt,
+            unetName: model,
+            clipName: FLUX2_CLIP,
+            vaeName: FLUX_VAE,
+            width, height, steps, cfg, sampler, scheduler, seed,
+          })
+        : flux
         ? buildFluxWorkflow({
             positivePrompt: prompt,
             negativePrompt,
             unetName: model,
             clip1: "t5xxl_fp16.safetensors",
             clip2: "clip_l.safetensors",
-            vaeName: "ae.safetensors",
+            vaeName: FLUX_VAE,
             width, height, steps, cfg, sampler, scheduler, seed,
           })
         : buildWorkflow({

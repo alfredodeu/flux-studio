@@ -1,4 +1,4 @@
-/** Flux.1-dev spezifische Workflows (UNETLoader + DualCLIPLoader + FluxGuidance) */
+/** Flux.1-dev und Flux.2-klein spezifische Workflows */
 
 export interface FluxWorkflowParams {
   positivePrompt: string;
@@ -19,6 +19,20 @@ export interface FluxWorkflowParams {
 export interface FluxImg2ImgParams extends FluxWorkflowParams {
   inputImageFilename: string;
   denoise: number;
+}
+
+export interface Flux2WorkflowParams {
+  positivePrompt: string;
+  unetName: string;       // z.B. "flux-2-klein-9b.safetensors"
+  clipName: string;       // "qwen_3_8b_fp8mixed.safetensors"
+  vaeName: string;        // "ae.safetensors"
+  width: number;
+  height: number;
+  steps: number;
+  cfg: number;
+  sampler: string;
+  scheduler: string;
+  seed: number;
 }
 
 export function buildFluxWorkflow(p: FluxWorkflowParams): Record<string, unknown> {
@@ -46,6 +60,23 @@ export function buildFluxWorkflow(p: FluxWorkflowParams): Record<string, unknown
     },
     "8": { class_type: "VAEDecode",  inputs: { samples: ["7", 0], vae: ["3", 0] } },
     "9": { class_type: "SaveImage",  inputs: { filename_prefix: "flux-studio-flux", images: ["8", 0] } },
+  };
+}
+
+export function buildFlux2Workflow(p: Flux2WorkflowParams): Record<string, unknown> {
+  return {
+    "1":  { class_type: "UNETLoader",            inputs: { unet_name: p.unetName, weight_dtype: "default" } },
+    "2":  { class_type: "CLIPLoader",             inputs: { clip_name: p.clipName, type: "flux2" } },
+    "3":  { class_type: "VAELoader",              inputs: { vae_name: p.vaeName } },
+    "4":  { class_type: "CLIPTextEncode",         inputs: { clip: ["2", 0], text: p.positivePrompt } },
+    "5":  { class_type: "EmptyFlux2LatentImage",  inputs: { width: p.width, height: p.height, batch_size: 1 } },
+    "6":  { class_type: "RandomNoise",            inputs: { noise_seed: p.seed } },
+    "7":  { class_type: "KSamplerSelect",         inputs: { sampler_name: p.sampler } },
+    "8":  { class_type: "Flux2Scheduler",         inputs: { scheduler: p.scheduler, steps: p.steps, model: ["1", 0] } },
+    "9":  { class_type: "CFGGuider",              inputs: { model: ["1", 0], positive: ["4", 0], negative: ["4", 0], cfg: 1.0 } },
+    "10": { class_type: "SamplerCustomAdvanced",  inputs: { noise: ["6", 0], guider: ["9", 0], sampler: ["7", 0], sigmas: ["8", 0], latent_image: ["5", 0] } },
+    "11": { class_type: "VAEDecode",              inputs: { samples: ["10", 0], vae: ["3", 0] } },
+    "12": { class_type: "SaveImage",              inputs: { filename_prefix: "flux-studio-flux2", images: ["11", 0] } },
   };
 }
 

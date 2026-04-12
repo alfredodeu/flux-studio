@@ -28,7 +28,11 @@ const DEFAULT_SETTINGS: Settings = {
 /** Optimale Einstellungen je nach Modell-Typ */
 function getPresetForModel(model: string): Partial<Settings> {
   const m = model.toLowerCase();
-  if (m.includes("flux")) {
+  if (m.includes("flux-2") || m.includes("flux2")) {
+    if (m.includes("4b")) return { steps: 12, cfg: 3.5, sampler: "euler", scheduler: "beta" };
+    if (m.includes("9b")) return { steps: 16, cfg: 3.5, sampler: "euler", scheduler: "beta" };
+    return { steps: 20, cfg: 3.5, sampler: "euler", scheduler: "beta" };
+  } else if (m.includes("flux")) {
     return { steps: 20, cfg: 3.5, sampler: "euler", scheduler: "beta" };
   } else if (m.includes("turbo")) {
     return { steps: 8, cfg: 2, sampler: "dpm_2", scheduler: "karras" };
@@ -37,6 +41,11 @@ function getPresetForModel(model: string): Partial<Settings> {
   } else {
     return { steps: 22, cfg: 6.5, sampler: "dpmpp_2m", scheduler: "karras" };
   }
+}
+
+function isFlux2(model: string) {
+  const m = model.toLowerCase();
+  return m.includes("flux-2") || m.includes("flux2");
 }
 
 function isFlux(model: string) {
@@ -82,7 +91,8 @@ export default function GenerationSettings({ value, onChange }: Props) {
     onChange({ ...value, [key]: val });
   }
 
-  const flux = isFlux(value.model);
+  const flux2 = isFlux2(value.model);
+  const flux  = !flux2 && isFlux(value.model);
 
   return (
     <div className="space-y-4">
@@ -108,11 +118,18 @@ export default function GenerationSettings({ value, onChange }: Props) {
         {/* Hinweis-Badge nach Auto-Anpassung */}
         {autoApplied && (
           <p className="text-xs text-violet-400 mt-1 animate-pulse">
-            ✨ Einstellungen automatisch für {flux ? "Flux.1-dev" : "dieses Modell"} optimiert
+            ✨ Einstellungen automatisch für {flux2 ? "FLUX.2-klein" : flux ? "Flux.1-dev" : "dieses Modell"} optimiert
           </p>
         )}
 
-        {/* Flux-Info-Badge */}
+        {/* Flux.2-Info-Badge */}
+        {flux2 && (
+          <div className="mt-2 text-xs bg-violet-900/30 border border-violet-700 rounded-lg px-3 py-2 text-violet-300">
+            <span className="font-semibold">FLUX.2-klein</span> — CLIPLoader (Qwen3) + Flux2Scheduler Workflow wird verwendet
+          </div>
+        )}
+
+        {/* Flux.1-Info-Badge */}
         {flux && (
           <div className="mt-2 text-xs bg-violet-900/30 border border-violet-700 rounded-lg px-3 py-2 text-violet-300">
             <span className="font-semibold">Flux.1-dev</span> — Dualer CLIP + FluxGuidance Workflow wird verwendet
