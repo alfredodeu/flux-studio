@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Flux Studio
+Comment=Startet ComfyUI + Flux Studio
+Exec=/home/%u/flux-studio/FluxStudio
+Type=Application
+Terminal=false
+Categories=Graphics;
