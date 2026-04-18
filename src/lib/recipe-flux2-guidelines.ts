@@ -243,30 +243,9 @@ export function generateFoodPrompt(
   prompt = prompt.replace("[DESSERT]", dishName);
   prompt = prompt.replace("[DRINK]", dishName);
 
-  // Spezialbehandlung für Pizza: Erkenne Typ und beschreibe Toppings spezifisch
-  if (dishNameLower.includes("pizza") && preset.name === "Pizza Croccante") {
-    if (["margherita", "mozzarella", "buffalo"].some((term) => dishNameLower.includes(term))) {
-      prompt = prompt.replace(
-        /tomato sauce mozzarella basil ONLY/gi,
-        "tomato sauce, fresh mozzarella, fresh basil ONLY"
-      );
-    } else if (["tonno", "tuna"].some((term) => dishNameLower.includes(term))) {
-      prompt = prompt.replace(
-        /minimal simple toppings only: tomato sauce mozzarella basil ONLY/gi,
-        "authentic Italian tuna pizza with: red tomato sauce base, melted fresh mozzarella cheese, generous flaked white canned tuna prominently visible, thin sliced red onions, capers, black olives, no pepperoni, no salami, no cured meats, pure fish toppings only, Italian Mediterranean style"
-      );
-    } else if (["quattro formaggi", "4 cheese", "vier käse"].some((term) => dishNameLower.includes(term))) {
-      prompt = prompt.replace(
-        /minimal simple toppings only: tomato sauce mozzarella basil ONLY/gi,
-        "four rich cheeses: mozzarella, gorgonzola, ricotta, parmesan, with tomato sauce"
-      );
-    } else if (["vegetariana", "veggie", "gemüse", "vegetables"].some((term) => dishNameLower.includes(term))) {
-      prompt = prompt.replace(
-        /minimal simple toppings only: tomato sauce mozzarella basil ONLY/gi,
-        "fresh vegetables: tomato sauce, mozzarella, bell peppers, zucchini, mushrooms, olives, artichokes"
-      );
-    }
-  }
+  // Hinweis: Pizza-Typ-Erkennung entfernt
+  // FLUX.2 kann spezifische Pizza-Toppings nicht zuverlässig handhaben
+  // Nutzer sollten für spezielle Varianten Custom Prompts verwenden
 
   // Intelligente Zutaten-basierte Ergänzung
   const ingredientLower = ingredients.map((i) => i.toLowerCase()).join(" ");
