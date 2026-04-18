@@ -235,12 +235,38 @@ export function generateFoodPrompt(
   customDetails?: string
 ): string {
   let prompt = preset.promptTemplate;
+  const dishNameLower = dishName.toLowerCase();
 
   // Ersetze Platzhalter
   prompt = prompt.replace("[DISH]", dishName);
   prompt = prompt.replace("[MAIN_ITEM]", ingredients[0] || dishName);
   prompt = prompt.replace("[DESSERT]", dishName);
   prompt = prompt.replace("[DRINK]", dishName);
+
+  // Spezialbehandlung für Pizza: Erkenne Typ und beschreibe Toppings spezifisch
+  if (dishNameLower.includes("pizza") && preset.name === "Pizza Croccante") {
+    if (["margherita", "mozzarella", "buffalo"].some((term) => dishNameLower.includes(term))) {
+      prompt = prompt.replace(
+        /tomato sauce mozzarella basil ONLY/gi,
+        "tomato sauce, fresh mozzarella, fresh basil ONLY"
+      );
+    } else if (["tonno", "tuna"].some((term) => dishNameLower.includes(term))) {
+      prompt = prompt.replace(
+        /minimal simple toppings only: tomato sauce mozzarella basil ONLY/gi,
+        "authentic toppings: tomato sauce, creamy mozzarella, flaked fresh tuna, red onions, capers, olives"
+      );
+    } else if (["quattro formaggi", "4 cheese", "vier käse"].some((term) => dishNameLower.includes(term))) {
+      prompt = prompt.replace(
+        /minimal simple toppings only: tomato sauce mozzarella basil ONLY/gi,
+        "four rich cheeses: mozzarella, gorgonzola, ricotta, parmesan, with tomato sauce"
+      );
+    } else if (["vegetariana", "veggie", "gemüse", "vegetables"].some((term) => dishNameLower.includes(term))) {
+      prompt = prompt.replace(
+        /minimal simple toppings only: tomato sauce mozzarella basil ONLY/gi,
+        "fresh vegetables: tomato sauce, mozzarella, bell peppers, zucchini, mushrooms, olives, artichokes"
+      );
+    }
+  }
 
   // Intelligente Zutaten-basierte Ergänzung
   const ingredientLower = ingredients.map((i) => i.toLowerCase()).join(" ");
