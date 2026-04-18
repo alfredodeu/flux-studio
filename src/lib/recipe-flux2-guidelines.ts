@@ -119,6 +119,34 @@ professional bar photography, cinematic, high detail, 8K`,
     negativePrompt: "flat, dull, artificial, plastic cup, boring",
     settings: { steps: 32, cfg: 3.5, sampler: "euler" },
   },
+  {
+    name: "Pasta Perfetto",
+    emoji: "🍝",
+    description: "Spezialisiert für Pasta und Nudel-Gerichte",
+    promptTemplate: `Professional pasta food photography von [DISH],
+creamy sauce with glossy, rich finish coating perfectly cooked al dente noodles,
+steam rising from hot fresh pasta, sauce texture visible,
+gourmet plating on white porcelain plate, fresh herbs garnish,
+warm golden studio lighting, shallow depth of field,
+mouth-watering appeal, fine dining presentation, high detail, 8K UHD,
+appetizing, professional food photographer`,
+    negativePrompt: "mushy pasta, dry sauce, dull finish, clumpy, overcooked, blurry, plastic",
+    settings: { steps: 40, cfg: 3.5, sampler: "ipndm_v" },
+  },
+  {
+    name: "Pizza Croccante",
+    emoji: "🍕",
+    description: "Spezialisiert für Pizza mit perfekter Kruste",
+    promptTemplate: `Professional pizza food photography von [DISH],
+crispy golden-brown crust with charred spots, melted mozzarella cheese bubbling,
+toppings in sharp focus showing fine details and vibrant colors,
+wood-fired pizza texture, fresh basil and olive oil drizzle,
+warm appetizing colors, shallow depth of field, soft bokeh background,
+professional food photography, studio lighting, cinematic, 8K detail,
+mouth-watering, award-winning food photography, luxurious presentation`,
+    negativePrompt: "burned crust, plastic cheese, soggy base, artificial toppings, undercooked, blurry, dull colors",
+    settings: { steps: 40, cfg: 3.5, sampler: "ipndm_v" },
+  },
 ];
 
 /**
@@ -152,7 +180,43 @@ export const FOOD_PHOTOGRAPHY_TIPS = {
 };
 
 /**
- * PROMPT-GENERATOR für Rezepte
+ * INTELLIGENTE KATEGORIE-ERKENNUNG für automatisches Preset
+ */
+export function detectFoodCategory(
+  dishName: string,
+  ingredients: string[]
+): RecipePreset {
+  const nameLower = dishName.toLowerCase();
+  const ingredientLower = ingredients.map((i) => i.toLowerCase()).join(" ");
+
+  // Pasta-Erkennung
+  if (
+    nameLower.includes("pasta") ||
+    nameLower.includes("nudel") ||
+    nameLower.includes("spaghetti") ||
+    nameLower.includes("penne") ||
+    nameLower.includes("ravioli") ||
+    nameLower.includes("lasagne") ||
+    ingredientLower.includes("pasta")
+  ) {
+    return RECIPE_PRESETS.find((p) => p.name === "Pasta Perfetto")!;
+  }
+
+  // Pizza-Erkennung
+  if (
+    nameLower.includes("pizza") ||
+    nameLower.includes("focaccia") ||
+    ingredientLower.includes("pizza dough")
+  ) {
+    return RECIPE_PRESETS.find((p) => p.name === "Pizza Croccante")!;
+  }
+
+  // Standard: Restaurant Quality
+  return RECIPE_PRESETS.find((p) => p.name === "Restaurant Quality")!;
+}
+
+/**
+ * PROMPT-GENERATOR für Rezepte mit intelligenten Zutaten-Ergänzungen
  */
 export function generateFoodPrompt(
   dishName: string,
@@ -167,6 +231,36 @@ export function generateFoodPrompt(
   prompt = prompt.replace("[MAIN_ITEM]", ingredients[0] || dishName);
   prompt = prompt.replace("[DESSERT]", dishName);
   prompt = prompt.replace("[DRINK]", dishName);
+
+  // Intelligente Zutaten-basierte Ergänzung
+  const ingredientLower = ingredients.map((i) => i.toLowerCase()).join(" ");
+
+  // Sauce-Verbesserung
+  if (
+    ingredientLower.includes("cream") ||
+    ingredientLower.includes("sahne") ||
+    ingredientLower.includes("sauce")
+  ) {
+    prompt = prompt.replace(/sauce/gi, "creamy, glossy sauce");
+  }
+
+  // Käse-Verbesserung
+  if (
+    ingredientLower.includes("cheese") ||
+    ingredientLower.includes("käse") ||
+    ingredientLower.includes("mozzarella")
+  ) {
+    prompt = prompt.replace(/cheese/gi, "melted, gooey cheese");
+  }
+
+  // Kruste-Verbesserung
+  if (
+    ingredientLower.includes("crust") ||
+    ingredientLower.includes("dough") ||
+    ingredientLower.includes("teig")
+  ) {
+    prompt = prompt.replace(/crust/gi, "crispy golden crust");
+  }
 
   // Füge Zutaten hinzu
   if (ingredients.length > 0) {
