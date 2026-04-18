@@ -144,7 +144,7 @@ wood-fired pizza texture, fresh basil and olive oil drizzle,
 warm appetizing colors, shallow depth of field, soft bokeh background,
 professional food photography, studio lighting, cinematic, 8K detail,
 mouth-watering, award-winning food photography, luxurious presentation`,
-    negativePrompt: "burned crust, plastic cheese, soggy base, artificial toppings, undercooked, blurry, dull colors",
+    negativePrompt: "burned crust, plastic cheese, soggy base, artificial toppings, undercooked, blurry, dull colors, pepperoni, salami, wurst, fleisch, meat toppings",
     settings: { steps: 40, cfg: 3.5, sampler: "ipndm_v" },
   },
 ];
