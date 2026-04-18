@@ -23,18 +23,24 @@ export default function RootLayout({
             <span className="text-xl font-bold text-violet-400">Flux Studio</span>
             <span className="text-xs text-gray-500 hidden sm:block">ComfyUI + Ollama</span>
           </div>
-          <nav className="flex gap-4 text-sm">
+          <nav className="flex gap-6 text-sm">
             <Link
               href="/"
               className="text-gray-300 hover:text-violet-400 transition-colors"
             >
-              Studio
+              🎨 Studio
+            </Link>
+            <Link
+              href="/recipe"
+              className="text-gray-300 hover:text-violet-400 transition-colors"
+            >
+              🍳 Recipe
             </Link>
             <Link
               href="/gallery"
               className="text-gray-300 hover:text-violet-400 transition-colors"
             >
-              Galerie
+              📷 Galerie
             </Link>
           </nav>
         </header>

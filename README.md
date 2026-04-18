@@ -1,3 +1,21 @@
+# Flux Studio
+
+> 🚀 **FLUX.2-Unterstützung mit vollständigen Guidelines & Best Practices**
+
+## 📖 Wichtig: FLUX.2 Guidelines
+
+Für optimale Ergebnisse mit FLUX.2-Modellen, bitte die **[FLUX2-GUIDELINES.md](./FLUX2-GUIDELINES.md)** lesen!
+
+Sie enthält:
+- ✅ Grundprinzipien für FLUX.2-Prompts (natürlich formulierte Sätze)
+- ✅ Negativ-Prompt Best Practices
+- ✅ Sampler & Scheduler Empfehlungen (discrete, flux2-scheduler, ipndm_v)
+- ✅ Vorgefertigte Presets (Schnell, Max Qualität, Ultra)
+- ✅ Prompt-Muster und Vorlagen
+- ✅ Troubleshooting für häufige Probleme
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { FLUX2_PRESETS } from "@/lib/flux2-guidelines";
 
 export interface Settings {
   model: string;
@@ -25,14 +26,33 @@ const DEFAULT_SETTINGS: Settings = {
   seed: -1,
 };
 
-/** Optimale Einstellungen je nach Modell-Typ */
+/** Optimale Einstellungen je nach Modell-Typ (nach FLUX.2-Guidelines) */
 function getPresetForModel(model: string): Partial<Settings> {
   const m = model.toLowerCase();
   if (m.includes("flux-2") || m.includes("flux2")) {
-    if (m.includes("4b")) return { steps: 12, cfg: 3.5, sampler: "euler", scheduler: "beta" };
-    if (m.includes("9b")) return { steps: 16, cfg: 3.5, sampler: "euler", scheduler: "beta" };
-    return { steps: 20, cfg: 3.5, sampler: "euler", scheduler: "beta" };
+    // FLUX.2-4b: schnell & gut für mobile/demo
+    if (m.includes("4b")) return {
+      steps: 12,
+      cfg: 3.0,
+      sampler: "euler",
+      scheduler: "discrete",
+    };
+    // FLUX.2-9b (klein): Standard - bestes Balance
+    if (m.includes("9b")) return {
+      steps: 28,
+      cfg: 3.5,
+      sampler: "euler",
+      scheduler: "discrete",
+    };
+    // FLUX.2-dev (full): max qualität
+    return {
+      steps: 40,
+      cfg: 3.0,
+      sampler: "ipndm_v",
+      scheduler: "discrete",
+    };
   } else if (m.includes("flux")) {
+    // FLUX.1-dev: bewährte Settings
     return { steps: 20, cfg: 3.5, sampler: "euler", scheduler: "beta" };
   } else if (m.includes("turbo")) {
     return { steps: 8, cfg: 2, sampler: "dpm_2", scheduler: "karras" };
