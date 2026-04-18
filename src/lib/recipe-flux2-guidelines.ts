@@ -253,7 +253,7 @@ export function generateFoodPrompt(
     } else if (["tonno", "tuna"].some((term) => dishNameLower.includes(term))) {
       prompt = prompt.replace(
         /minimal simple toppings only: tomato sauce mozzarella basil ONLY/gi,
-        "authentic toppings: tomato sauce, creamy mozzarella, flaked fresh tuna, red onions, capers, olives"
+        "authentic Italian tuna pizza with: red tomato sauce base, melted fresh mozzarella cheese, generous flaked white canned tuna prominently visible, thin sliced red onions, capers, black olives, no pepperoni, no salami, no cured meats, pure fish toppings only, Italian Mediterranean style"
       );
     } else if (["quattro formaggi", "4 cheese", "vier käse"].some((term) => dishNameLower.includes(term))) {
       prompt = prompt.replace(
